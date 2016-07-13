@@ -22,7 +22,7 @@ typedef struct network{
     layer *layers;
     int outputs;
     float *output;
-    learning_rate_policy policy;
+    learning_rate_policy policy;//枚举型变量： CONSTANT, STEP, EXP, POLY, STEPS, SIG, RANDOM
 
     float learning_rate;
     float gamma;

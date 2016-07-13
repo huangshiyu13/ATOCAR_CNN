@@ -37,9 +37,9 @@ typedef enum{
 } COST_TYPE;
 
 struct layer{
-    LAYER_TYPE type;
-    ACTIVATION activation;
-    COST_TYPE cost_type;
+    LAYER_TYPE type;//枚举型变量
+    ACTIVATION activation;//枚举型变量，激活函数LOGISTIC, RELU, RELIE, LINEAR, RAMP, TANH, PLSE, LEAKY, ELU, LOGGY, STAIR, HARDTAN, LHTAN
+    COST_TYPE cost_type;//枚举型变量，代价函数（unknow）：SSE, MASKED, SMOOTH
     int batch_normalize;
     int shortcut;
     int batch;
@@ -48,8 +48,8 @@ struct layer{
     int inputs;
     int outputs;
     int truths;
-    int h,w,c;
-    int out_h, out_w, out_c;
+    int h,w,c;//输入大小
+    int out_h, out_w, out_c;//输出大小
     int n;
     int max_boxes;
     int groups;

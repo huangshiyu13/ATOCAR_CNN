@@ -1,3 +1,5 @@
+/**************解析器************************/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -28,7 +30,7 @@
 #include "utils.h"
 
 typedef struct{
-    char *type;
+    char *type;//用于存储一行的内容
     list *options;
 }section;
 
@@ -507,9 +509,9 @@ void parse_net_options(list *options, network *net)
     net->max_batches = option_find_int(options, "max_batches", 0);
 }
 
-network parse_network_cfg(char *filename)
+network parse_network_cfg(char *filename)//用于解析配置文件
 {
-    list *sections = read_cfg(filename);
+    list *sections = read_cfg(filename);//读入配置文件生成链表
     node *n = sections->front;
     if(!n) error("Config file has no sections");
     network net = make_network(sections->size - 1);
@@ -745,15 +747,15 @@ list *read_cfg(char *filename)
     if(file == 0) file_error(filename);
     char *line;
     int nu = 0;
-    list *sections = make_list();
+    list *sections = make_list();//初始化双向链表
     section *current = 0;
-    while((line=fgetl(file)) != 0){
+    while((line=fgetl(file)) != 0){//取得一行
         ++ nu;
-        strip(line);
+        strip(line);//去掉制表符，换行符和空格
         switch(line[0]){
             case '[':
                 current = malloc(sizeof(section));
-                list_insert(sections, current);
+                list_insert(sections, current);//插入链表
                 current->options = make_list();
                 current->type = line;
                 break;
@@ -763,7 +765,7 @@ list *read_cfg(char *filename)
                 free(line);
                 break;
             default:
-                if(!read_option(line, current->options)){
+                if(!read_option(line, current->options)){//插入(key,val)对
                     fprintf(stderr, "Config file error line %d, could parse: %s\n", nu, line);
                     free(line);
                 }

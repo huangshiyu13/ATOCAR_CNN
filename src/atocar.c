@@ -15,7 +15,7 @@ image atocar_labels[20];
 
 void train_atocar(char *cfgfile, char *weightfile)
 {
-    char *train_images = "/data/voc/train.txt";
+    char *train_images = "/data/voc/train.txt";//TODO read from configure file
     char *backup_directory = "/home/pjreddie/backup/";
     srand(time(0));
     data_seed = time(0);
