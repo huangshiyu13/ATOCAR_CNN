@@ -400,7 +400,7 @@ void forward_convolutional_layer(convolutional_layer l, network_state state)
     int i;
 
 
-    fill_cpu(l.outputs*l.batch, 0, l.output, 1);
+    fill_cpu(l.outputs*l.batch, 0, l.output, 1);//³õÊ¼»¯outputÎª0
 
     /*
        if(l.binary){

@@ -810,7 +810,7 @@ float bilinear_interpolate(image im, float x, float y, int c)
     return val;
 }
 
-image resize_image(image im, int w, int h)
+image resize_image(image im, int w, int h)//手动对image进行resize
 {
     image resized = make_image(w, h, im.c);   
     image part = make_image(w, im.h, im.c);
@@ -998,7 +998,7 @@ image load_image(char *filename, int w, int h, int c)
     return out;
 }
 
-image load_image_color(char *filename, int w, int h)
+image load_image_color(char *filename, int w, int h)//加载图像
 {
     return load_image(filename, w, h, 3);
 }

@@ -226,20 +226,20 @@ void validate_atocar(char *cfgfile, char *weightfile)
 void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)
 {
 
-    network net = parse_network_cfg(cfgfile);
+    network net = parse_network_cfg(cfgfile);//解析配置文件，加载各个层
     if(weightfile){
-        load_weights(&net, weightfile);
+        load_weights(&net, weightfile);//加载weights文件
     }
     detection_layer l = net.layers[net.n-1];
     set_batch_network(&net, 1);
-    srand(2222222);
+    srand(2222222);//TODO should be real random
     clock_t time;
     char buff[256];
     char *input = buff;
     int j;
     float nms=.5;
-    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));
-    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));
+    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;有这么多个boundingbox
+    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//每个boundingbox有个float数组，存对各个物体的期望值。
     for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
     while(1){
         if(filename){
@@ -255,13 +255,15 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)
         image sized = resize_image(im, net.w, net.h);
         float *X = sized.data;
         time=clock();
-        float *predictions = network_predict(net, X);
+        
+		float *predictions = network_predict(net, X);
         printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
         convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
         if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
         //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
         draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
-        save_image(im, "predictions");
+        
+		save_image(im, "predictions");
         show_image(im, "predictions");
 
         show_image(sized, "resized");

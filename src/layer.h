@@ -100,7 +100,7 @@ struct layer{
     int *indexes;
     float *rand;
     float *cost;
-    float *filters;
+    float *filters;//用于存储卷基层训练后的参数
     char  *cfilters;
     float *filter_updates;
     float *state;

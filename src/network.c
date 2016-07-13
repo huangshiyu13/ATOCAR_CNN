@@ -123,7 +123,7 @@ char *get_layer_string(LAYER_TYPE a)
     return "none";
 }
 
-network make_network(int n)
+network make_network(int n)//初始化network
 {
     network net = {0};
     net.n = n;
@@ -136,7 +136,7 @@ network make_network(int n)
     return net;
 }
 
-void forward_network(network net, network_state state)
+void forward_network(network net, network_state state)//网络向前
 {
     state.workspace = net.workspace;
     int i;
@@ -144,7 +144,7 @@ void forward_network(network net, network_state state)
         state.index = i;
         layer l = net.layers[i];
         if(l.delta){
-            scal_cpu(l.outputs * l.batch, 0, l.delta, 1);
+            scal_cpu(l.outputs * l.batch, 0, l.delta, 1);//scal_cpu(int N, float ALPHA, float *X, int INCX) X[i*INCX] *= ALPHA;
         }
         if(l.type == CONVOLUTIONAL){
             forward_convolutional_layer(l, state);

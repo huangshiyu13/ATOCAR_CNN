@@ -447,7 +447,7 @@ learning_rate_policy get_policy(char *s)
     return CONSTANT;
 }
 
-void parse_net_options(list *options, network *net)
+void parse_net_options(list *options, network *net)//解析配置文件，
 {
     net->batch = option_find_int(options, "batch",1);
     net->learning_rate = option_find_float(options, "learning_rate", .001);
@@ -520,7 +520,7 @@ network parse_network_cfg(char *filename)//用于解析配置文件
     section *s = (section *)n->val;
     list *options = s->options;
     if(!is_network(s)) error("First section must be [net] or [network]");
-    parse_net_options(options, &net);
+    parse_net_options(options, &net);//解析网络配置，比如policy,learning rate and etc.
 
     params.h = net.h;
     params.w = net.w;
@@ -533,7 +533,7 @@ network parse_network_cfg(char *filename)//用于解析配置文件
     n = n->next;
     int count = 0;
     free_section(s);
-    while(n){
+    while(n){//开始解析各个层
         params.index = count;
         fprintf(stderr, "%d: ", count);
         s = (section *)n->val;

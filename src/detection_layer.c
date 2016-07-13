@@ -39,7 +39,7 @@ detection_layer make_detection_layer(int batch, int inputs, int n, int side, int
     return l;
 }
 
-void forward_detection_layer(const detection_layer l, network_state state)
+void forward_detection_layer(const detection_layer l, network_state state)//detection任务的最后一层
 {
     int locations = l.side*l.side;
     int i,j;
