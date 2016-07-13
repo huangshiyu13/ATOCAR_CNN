@@ -17,7 +17,7 @@ void train_atocar(char *cfgfile, char *weightfile)
 {
     char *train_images = "/data/voc/train.txt";//TODO read from configure file
     char *backup_directory = "/home/pjreddie/backup/";
-    srand(time(0));
+    srand(time(0));//随机种子
     data_seed = time(0);
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
@@ -36,11 +36,11 @@ void train_atocar(char *cfgfile, char *weightfile)
 
     int side = l.side;
     int classes = l.classes;
-    float jitter = l.jitter;
+    float jitter = l.jitter;//unknow
 
-    list *plist = get_paths(train_images);
+    list *plist = get_paths(train_images);//载入所有image的路径
     //int N = plist->size;
-    char **paths = (char **)list_to_array(plist);
+    char **paths = (char **)list_to_array(plist);//转换列表到数组
 
     load_args args = {0};
     args.w = net.w;
@@ -223,7 +223,7 @@ void validate_atocar(char *cfgfile, char *weightfile)
     fprintf(stderr, "Total Detection Time: %f Seconds\n", (double)(time(0) - start));
 }
 
-void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)
+void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)//测试单张图片
 {
 
     network net = parse_network_cfg(cfgfile);//解析配置文件，加载各个层

@@ -43,7 +43,7 @@ void reset_momentum(network net)
     #endif
 }
 
-float get_current_rate(network net)
+float get_current_rate(network net)//得到学习率
 {
     int batch_num = get_current_batch(net);
     int i;

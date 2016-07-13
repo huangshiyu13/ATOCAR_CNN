@@ -21,7 +21,7 @@ static inline float distance_from_edge(int x, int max)
 
 typedef struct{
     int w, h;
-    matrix X;
+    matrix X;//¶şÎ¬¾ØÕó
     matrix y;
     int *indexes;
     int shallow;

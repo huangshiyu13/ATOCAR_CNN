@@ -280,8 +280,8 @@ void fill_truth_detection(char *path, int num_boxes, float *truth, int classes, 
     labelpath = find_replace(labelpath, ".JPG", ".txt");
     labelpath = find_replace(labelpath, ".JPEG", ".txt");
     int count = 0;
-    box_label *boxes = read_boxes(labelpath, &count);
-    randomize_boxes(boxes, count);
+    box_label *boxes = read_boxes(labelpath, &count);//¶ÁÈëboudingbox
+    randomize_boxes(boxes, count);//´òÂÒboundingboxË³Ðò
     correct_boxes(boxes, count, dx, dy, sx, sy, flip);
     if(count > num_boxes) count = num_boxes;
     float x,y,w,h;
@@ -633,7 +633,7 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int boxes, in
         float sx = (float)swidth  / ow;
         float sy = (float)sheight / oh;
 
-        int flip = rand_r(&data_seed)%2;
+        int flip = rand_r(&data_seed)%2;//ÊÇ·ñ·­×ªÍ¼Æ¬
         image cropped = crop_image(orig, pleft, ptop, swidth, sheight);
 
         float dx = ((float)pleft/ow)/sx;
