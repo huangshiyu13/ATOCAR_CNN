@@ -13,6 +13,8 @@ convnet/
 decaf/
 submission/
 cfg/
+backup/
+train.txt
 darknet
 
 # OS Generated #

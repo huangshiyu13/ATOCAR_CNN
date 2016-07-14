@@ -6,8 +6,15 @@
 #include <unistd.h>
 #include <float.h>
 #include <limits.h>
+#include <string.h>
 
 #include "utils.h"
+
+unsigned int myRand(){
+	srand(data_seed);
+	data_seed = rand();
+	return data_seed;
+}
 
 void sorta_shuffle(void *arr, size_t n, size_t size, size_t sections)
 {

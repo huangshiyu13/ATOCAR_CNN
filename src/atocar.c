@@ -6,17 +6,25 @@
 #include "box.h"
 #include "demo.h"
 
+#include "time.h"
+#include "stdio.h"
+#include "stdlib.h"
+
+#include "data.h"
+#include "image.h"
+#include "cuda.h"
+
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"
 #endif
-
-char *label_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
-image atocar_labels[20];
+#define labelNum 1
+char *label_names[] = {"pedestrian"};
+image atocar_labels[labelNum];
 
 void train_atocar(char *cfgfile, char *weightfile)
 {
-    char *train_images = "/data/voc/train.txt";//TODO read from configure file
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *train_images = "../data/train.txt";//TODO read from configure file
+    char *backup_directory = "backup/";
     srand(time(0));//Ëæ»úÖÖ×Ó
     data_seed = time(0);
     char *base = basecfg(cfgfile);
@@ -67,6 +75,7 @@ void train_atocar(char *cfgfile, char *weightfile)
         printf("Loaded: %lf seconds\n", sec(clock()-time));
 
         time=clock();
+		//showImg();
         float loss = train_network(net, train);
         if (avg_loss < 0) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
@@ -74,13 +83,13 @@ void train_atocar(char *cfgfile, char *weightfile)
         printf("%d: %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
         if(i%1000==0 || (i < 1000 && i%100 == 0)){
             char buff[256];
-            sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
+            sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);
             save_weights(net, buff);
         }
         free_data(train);
     }
     char buff[256];
-    sprintf(buff, "%s/%s_final.weights", backup_directory, base);
+    sprintf(buff, "%s/atocar.weights", backup_directory);
     save_weights(net, buff);
 }
 
@@ -261,7 +270,7 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
         convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
         if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
         //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
-        draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
+        draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, labelNum);
         
 		save_image(im, "predictions");
         show_image(im, "predictions");
@@ -277,12 +286,16 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
     }
 }
 
-
+void test(){
+		
+} 
 
 void run_atocar(int argc, char **argv)
 {
+	test();
+	//return;
     int i;
-    for(i = 0; i < 20; ++i){
+    for(i = 0; i < labelNum; ++i){
         char buff[256];
         sprintf(buff, "data/labels/%s.png", label_names[i]);
         atocar_labels[i] = load_image_color(buff, 0, 0);

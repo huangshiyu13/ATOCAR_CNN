@@ -6,8 +6,6 @@
 #include "list.h"
 #include "image.h"
 
-extern unsigned int data_seed;
-
 static inline float distance_from_edge(int x, int max)
 {
     int dx = (max/2) - x;

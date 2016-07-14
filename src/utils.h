@@ -5,7 +5,11 @@
 #include "list.h"
 
 #define SECRET_NUM -1234
+char* img_path;
+unsigned int data_seed;
 
+
+unsigned int myRand();
 void shuffle(void *arr, size_t n, size_t size);
 void sorta_shuffle(void *arr, size_t n, size_t size, size_t sections);
 void free_ptrs(void **ptrs, int n);
