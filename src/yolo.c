@@ -15,8 +15,8 @@ image voc_labels[20];
 
 void train_yolo(char *cfgfile, char *weightfile)
 {
-    char *train_images = "/data/voc/train.txt";
-    char *backup_directory = "/home/pjreddie/backup/";
+    char *train_images = "C:/Users/huangsy13/Desktop/test/data/VOCtest_06-Nov-2007/2007_test.txt";
+    char *backup_directory = "backup/";
     srand(time(0));
     data_seed = time(0);
     char *base = basecfg(cfgfile);

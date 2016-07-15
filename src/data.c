@@ -42,7 +42,7 @@ char **get_random_paths(char **paths, int n, int m)
     for(i = 0; i < n; ++i){
 		//printf("\n\n%d\n\n",data_seed);
         int index = myRand()%m;//myRand()%m;
-		printf("\n\n%d %d %d\n\n",index,m,data_seed);
+		//printf("\n\n%d %d %d\n\n",index,m,data_seed);
         random_paths[i] = paths[index];
         if(i == 0) printf("%s\n", paths[index]);
     }
@@ -242,14 +242,14 @@ void fill_truth_region(char *path, float *truth, int classes, int num_boxes, int
     float x,y,w,h;
     int id;
     int i;
-
+	
     for (i = 0; i < count; ++i) {
         x =  boxes[i].x;
         y =  boxes[i].y;
         w =  boxes[i].w;
         h =  boxes[i].h;
         id = boxes[i].id;
-
+		//printf("\nhahah:%d %f %f %f %f\n",id,x,y,w,h);
         if (w < .01 || h < .01) continue;
 
         int col = (int)(x*num_boxes);
@@ -436,16 +436,17 @@ void free_data(data d)
 }
 
 void getPath(char **random_paths,int n){
-	printf("\n\nbegin!");
-	for(int i= 0 ; i < n ; i ++){
-		printf("img_path:%s\n",random_paths[i]);
-	}
-	printf("done!\n\n");
+	//printf("\n\nbegin!\n");
+	//for(int i= 0 ; i < n ; i ++){
+		//printf("img_path:%s\n",random_paths[i]);
+	//}
+	//printf("done!\n\n");
 	
 	if(img_path == NULL ){
 		img_path = calloc(512,sizeof(char));
 	}
-	//memcpy(img_path,random_paths[0],strlen(random_paths[0]));
+	memset(img_path,0,512*sizeof(char));
+	memcpy(img_path,random_paths[0],strlen(random_paths[0]));
 	//printf("img_path:%s\n",img_path);
 }
 

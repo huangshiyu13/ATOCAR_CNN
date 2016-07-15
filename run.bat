@@ -1,1 +1,1 @@
-darknet.exe atocar train cfg/atocar-tiny.cfg ../weights/extraction.conv.weights
+darknet.exe atocar train cfg/atocar.cfg ../weights/extraction.conv.weights

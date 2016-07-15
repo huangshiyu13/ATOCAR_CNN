@@ -18,14 +18,57 @@
 #include "opencv2/highgui/highgui_c.h"
 #endif
 #define labelNum 1
-char *label_names[] = {"pedestrian"};
+//char *label_names[] = {"pedestrian"};
+char *label_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 image atocar_labels[labelNum];
+
+void testDetection(network net){
+	float thresh = 0.5;
+    detection_layer l = net.layers[net.n-1];
+    set_batch_network(&net, 1);
+    srand(2222222);//TODO should be real random
+    clock_t time;
+    char buff[256];
+    char *input = buff;
+    int j;
+    float nms=.5;
+    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;有这么多个boundingbox
+    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//每个boundingbox有个float数组，存对各个物体的期望值。
+    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
+  
+        
+        image im = load_image_color(img_path,0,0);
+        image sized = resize_image(im, net.w, net.h);
+        float *X = sized.data;
+        time=clock();
+        
+		float *predictions = network_predict(net, X);
+        //printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
+        convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
+        if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
+        //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
+        draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, labelNum);
+        
+		save_image(im, "predictions");
+        show_image(im, "predictions");
+
+        show_image(sized, "resized");
+        free_image(im);
+        free_image(sized);
+#ifdef OPENCV
+        cvWaitKey(0);
+        cvDestroyAllWindows();
+#endif
+	//printf("%f %f %f %f %f\n",boxes[0].x,boxes[0].y,boxes[0].w,boxes[0].h,probs[0]);
+	//getchar();
+}
 
 void train_atocar(char *cfgfile, char *weightfile)
 {
-    char *train_images = "../data/train.txt";//TODO read from configure file
-    char *backup_directory = "backup/";
-    srand(time(0));//随机种子
+    //char *train_images = "C:/Users/huangsy13/Desktop/test/data/VOCtest_06-Nov-2007/2007_test.txt";//TODO read from configure file
+    char *train_images = "../data/train.txt";
+	char *backup_directory = "backup/";
+    //srand(time(0));//随机种子
     data_seed = time(0);
     char *base = basecfg(cfgfile);
     printf("%s\n", base);
@@ -34,7 +77,7 @@ void train_atocar(char *cfgfile, char *weightfile)
     if(weightfile){
         load_weights(&net, weightfile);
     }
-    printf("Learning Rate: %g, Momentum: %g, Decay: %g\n", net.learning_rate, net.momentum, net.decay);
+    //printf("Learning Rate: %g, Momentum: %g, Decay: %g\n", net.learning_rate, net.momentum, net.decay);
     int imgs = net.batch*net.subdivisions;
     int i = *net.seen/imgs;
     data train, buffer;
@@ -67,20 +110,25 @@ void train_atocar(char *cfgfile, char *weightfile)
     //while(i*imgs < N*120){
     while(get_current_batch(net) < net.max_batches){
         i += 1;
+		
         time=clock();
         pthread_join(load_thread, 0);
         train = buffer;
         load_thread = load_data_in_thread(args);
 
-        printf("Loaded: %lf seconds\n", sec(clock()-time));
+        //printf("Loaded: %lf seconds\n", sec(clock()-time));
 
         time=clock();
 		//showImg();
-        float loss = train_network(net, train);
+		//printf("test img_path:%s\n",img_path);
+		
+		//testDetection(net);
+        
+		float loss = train_network(net, train);
         if (avg_loss < 0) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
 
-        printf("%d: %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
+        printf("time %d: loss %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
         if(i%1000==0 || (i < 1000 && i%100 == 0)){
             char buff[256];
             sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);

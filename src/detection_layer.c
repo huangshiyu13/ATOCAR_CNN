@@ -39,7 +39,7 @@ detection_layer make_detection_layer(int batch, int inputs, int n, int side, int
     return l;
 }
 
-void forward_detection_layer(const detection_layer l, network_state state)//detection任务的最后一层
+void forward_detection_layer(const detection_layer l, network_state state)
 {
     int locations = l.side*l.side;
     int i,j;
@@ -51,7 +51,7 @@ void forward_detection_layer(const detection_layer l, network_state state)//dete
             for (i = 0; i < locations; ++i) {
                 int offset = i*l.classes;
                 softmax_array(l.output + index + offset, l.classes, 1,
-                        l.output + index + offset);
+							  l.output + index + offset);
             }
         }
     }
