@@ -1,0 +1,1 @@
+./darknet atocar train ./cfg/atocar.cfg ../weights/extraction.conv.weights
