@@ -1,3 +1,4 @@
+*.udb
 *.o
 *.dSYM
 *.csv
