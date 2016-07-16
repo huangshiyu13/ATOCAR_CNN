@@ -10,6 +10,9 @@
 
 #include "utils.h"
 
+char* img_path;
+unsigned int data_seed;
+
 unsigned int myRand(){
 	srand(data_seed);
 	data_seed = rand();
@@ -39,7 +42,7 @@ void shuffle(void *arr, size_t n, size_t size)
     }
 }
 
-void del_arg(int argc, char **argv, int index)//删除位于i处的参数，后面的整体向前移动
+void del_arg(int argc, char **argv, int index)//删位i牟前贫
 {
     int i;
     for(i = index; i < argc-1; ++i) argv[i] = argv[i+1];
@@ -59,13 +62,13 @@ int find_arg(int argc, char* argv[], char *arg)
     return 0;
 }
 
-int find_int_arg(int argc, char **argv, char *arg, int def)//找到后返回并删除参数
+int find_int_arg(int argc, char **argv, char *arg, int def)//业蠓祷夭删
 {
     int i;
     for(i = 0; i < argc-1; ++i){
         if(!argv[i]) continue;
         if(0==strcmp(argv[i], arg)){
-            def = atoi(argv[i+1]);//字符串转化成int
+            def = atoi(argv[i+1]);//址转int
             del_arg(argc, argv, i);
             del_arg(argc, argv, i);
             break;

@@ -5,8 +5,8 @@
 #include "list.h"
 
 #define SECRET_NUM -1234
-char* img_path;
-unsigned int data_seed;
+extern char* img_path;
+extern unsigned int data_seed;
 
 
 unsigned int myRand();
