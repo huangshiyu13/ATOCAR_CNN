@@ -967,7 +967,12 @@ static unsigned char *stbi__load_main(stbi__context *s, int *x, int *y, int *com
 static unsigned char *stbi__load_flip(stbi__context *s, int *x, int *y, int *comp, int req_comp)
 {
    unsigned char *result = stbi__load_main(s, x, y, comp, req_comp);
-
+   if(result == NULL){
+		//printf("print wrong!\n");
+   }
+   else{
+		//printf("everything is OK\n");
+   }
    if (stbi__vertically_flip_on_load && result != NULL) {
       int w = *x, h = *y;
       int depth = req_comp ? req_comp : *comp;
@@ -981,6 +986,7 @@ static unsigned char *stbi__load_flip(stbi__context *s, int *x, int *y, int *com
                temp = result[(row * w + col) * depth + z];
                result[(row * w + col) * depth + z] = result[((h - row - 1) * w + col) * depth + z];
                result[((h - row - 1) * w + col) * depth + z] = temp;
+			   //printf("in\n");
             }
          }
       }
@@ -1017,10 +1023,21 @@ static FILE *stbi__fopen(char const *filename, char const *mode)
 {
    FILE *f;
 #if defined(_MSC_VER) && _MSC_VER >= 1400
+  
    if (0 != fopen_s(&f, filename, mode))
       f=0;
 #else
+  //filename = "../data/images/1.jpg";
+   //printf("good\n%s\n%d\n%d\n",filename,strlen(filename),(int)filename[strlen(filename)-1]);
+   
    f = fopen(filename, mode);
+   //if(f){
+//	printf("very good\n");
+   //}
+   //else{
+//	   printf("very bad\n");
+   //}
+   
 #endif
    return f;
 }
@@ -1030,8 +1047,11 @@ STBIDEF stbi_uc *stbi_load(char const *filename, int *x, int *y, int *comp, int 
 {
    FILE *f = stbi__fopen(filename, "rb");
    unsigned char *result;
+   
    if (!f) return stbi__errpuc("can't fopen", "Unable to open file");
+   
    result = stbi_load_from_file(f,x,y,comp,req_comp);
+   
    fclose(f);
    return result;
 }
@@ -1043,6 +1063,7 @@ STBIDEF stbi_uc *stbi_load_from_file(FILE *f, int *x, int *y, int *comp, int req
    stbi__start_file(&s,f);
    result = stbi__load_flip(&s,x,y,comp,req_comp);
    if (result) {
+	   //printf("I am in\n");
       // need to 'unget' all the characters in the IO buffer
       fseek(f, - (int) (s.img_buffer_end - s.img_buffer), SEEK_CUR);
    }

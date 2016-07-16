@@ -810,7 +810,7 @@ float bilinear_interpolate(image im, float x, float y, int c)
     return val;
 }
 
-image resize_image(image im, int w, int h)//手动对image进行resize
+image resize_image(image im, int w, int h)//侄imageresize
 {
     image resized = make_image(w, h, im.c);   
     image part = make_image(w, im.h, im.c);
@@ -961,6 +961,7 @@ image load_image_cv(char *filename, int channels)
 image load_image_stb(char *filename, int channels)
 {
     int w, h, c;
+	
     unsigned char *data = stbi_load(filename, &w, &h, &c, channels);
     if (!data) {
         fprintf(stderr, "Cannot load image \"%s\"\nSTB Reason: %s\n", filename, stbi_failure_reason());
@@ -998,7 +999,7 @@ image load_image(char *filename, int w, int h, int c)
     return out;
 }
 
-image load_image_color(char *filename, int w, int h)//加载图像
+image load_image_color(char *filename, int w, int h)//图
 {
     return load_image(filename, w, h, 3);
 }
