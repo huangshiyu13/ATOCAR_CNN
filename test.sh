@@ -1,0 +1,1 @@
+./darknet atocar test cfg/atocar.cfg ./backup/atocar.weights ../data/images/2.jpg
