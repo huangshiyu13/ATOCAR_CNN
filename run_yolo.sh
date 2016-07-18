@@ -1,0 +1,1 @@
+./darknet -i 1 yolo train ./cfg/yolo.cfg ../weights/extraction.conv.weights

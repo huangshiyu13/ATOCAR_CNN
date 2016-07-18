@@ -1,1 +1,1 @@
-./darknet atocar test cfg/atocar.cfg ./backup/atocar.weights ../data/images/2.jpg
+./darknet atocar test cfg/atocar.cfg ./backup/yolo_final.weights ../data/images/2.jpg

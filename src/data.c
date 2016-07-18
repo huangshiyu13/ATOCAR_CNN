@@ -38,13 +38,13 @@ char **get_random_paths(char **paths, int n, int m)
     char **random_paths = calloc(n, sizeof(char*));
 	
     int i;
-	//srand(time(0));//Ëæ»úÖÖ×Ó
+	//srand(time(0));//
     for(i = 0; i < n; ++i){
 		//printf("\n\n%d\n\n",data_seed);
         int index = myRand()%m;//myRand()%m;
 		//printf("\n\n%d %d %d\n\n",index,m,data_seed);
         random_paths[i] = paths[index];
-        if(i == 0) printf("%s\n", paths[index]);
+        //if(i == 0) printf("%s\n", paths[index]);
     }
     return random_paths;
 }
@@ -132,6 +132,7 @@ box_label *read_boxes(char *filename, int *n)
     int id;
     int count = 0;
     while(fscanf(file, "%d %f %f %f %f", &id, &x, &y, &w, &h) == 5){
+		//printf("%s:%d %f %f %f %f\n",filename,id, x, y, w, h),
         boxes = realloc(boxes, (count+1)*sizeof(box_label));
         boxes[count].id = id;
         boxes[count].x = x;
@@ -282,8 +283,8 @@ void fill_truth_detection(char *path, int num_boxes, float *truth, int classes, 
     labelpath = find_replace(labelpath, ".JPG", ".txt");
     labelpath = find_replace(labelpath, ".JPEG", ".txt");
     int count = 0;
-    box_label *boxes = read_boxes(labelpath, &count);//¶ÁÈëboudingbox
-    randomize_boxes(boxes, count);//´òÂÒboundingboxË³Ðò
+    box_label *boxes = read_boxes(labelpath, &count);//boudingbox
+    randomize_boxes(boxes, count);//boundingboxË³
     correct_boxes(boxes, count, dx, dy, sx, sy, flip);
     if(count > num_boxes) count = num_boxes;
     float x,y,w,h;
@@ -452,10 +453,11 @@ void getPath(char **random_paths,int n){
 
 data load_data_region(int n, char **paths, int m, int w, int h, int size, int classes, float jitter)
 {
+	//printf("in1\n");
     char **random_paths = get_random_paths(paths, n, m);
-	
+	//printf("in1.5\n");
 	getPath(random_paths,n);
-	
+	//printf("in1.6\n");
     int i;
     data d = {0};
     d.shallow = 0;
@@ -502,6 +504,7 @@ data load_data_region(int n, char **paths, int m, int w, int h, int size, int cl
         free_image(orig);
         free_image(cropped);
     }
+	//printf("in2\n");
     free(random_paths);
     return d;
 }
@@ -656,7 +659,7 @@ data load_data_detection(int n, char **paths, int m, int w, int h, int boxes, in
         float sx = (float)swidth  / ow;
         float sy = (float)sheight / oh;
 
-        int flip = myRand()%2;//ÊÇ·ñ·­×ªÍ¼Æ¬
+        int flip = myRand()%2;//Ç·×ªÍ¼Æ¬
         image cropped = crop_image(orig, pleft, ptop, swidth, sheight);
 
         float dx = ((float)pleft/ow)/sx;
@@ -712,6 +715,7 @@ void *load_thread(void *ptr)
         //*a.d = load_data(a.paths, a.n, a.m, a.labels, a.classes, a.w, a.h);
     }
     free(ptr);
+	
     return 0;
 }
 

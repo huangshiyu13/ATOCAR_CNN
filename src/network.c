@@ -43,7 +43,7 @@ void reset_momentum(network net)
     #endif
 }
 
-float get_current_rate(network net)//得到学习率
+float get_current_rate(network net)//玫学习
 {
     int batch_num = get_current_batch(net);
     int i;
@@ -123,7 +123,7 @@ char *get_layer_string(LAYER_TYPE a)
     return "none";
 }
 
-network make_network(int n)//初始化network
+network make_network(int n)//始network
 {
     network net = {0};
     net.n = n;
@@ -136,7 +136,7 @@ network make_network(int n)//初始化network
     return net;
 }
 
-void forward_network(network net, network_state state)//网络向前
+void forward_network(network net, network_state state)//前
 {
     state.workspace = net.workspace;
     int i;
@@ -353,13 +353,19 @@ float train_network(network net, data d)
 
     int i;
     float sum = 0;
+	
     for(i = 0; i < n; ++i){
+		
         get_next_batch(d, batch, i*batch, X, y);
-        float err = train_network_datum(net, X, y);
+        
+		float err = train_network_datum(net, X, y);
+		
         sum += err;
     }
+	
     free(X);
     free(y);
+	
     return (float)sum/(n*batch);
 }
 
