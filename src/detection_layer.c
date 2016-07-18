@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 detection_layer make_detection_layer(int batch, int inputs, int n, int side, int classes, int coords, int rescore)
 {
@@ -41,6 +42,8 @@ detection_layer make_detection_layer(int batch, int inputs, int n, int side, int
 
 void forward_detection_layer(const detection_layer l, network_state state)
 {
+	bool debugDetection = false;
+	//printf("time:%d\n",state.net.seen);
     int locations = l.side*l.side;
     int i,j;
     memcpy(l.output, state.input, l.outputs*l.batch*sizeof(float));
@@ -56,6 +59,7 @@ void forward_detection_layer(const detection_layer l, network_state state)
         }
     }
     if(state.train){
+		
         float avg_iou = 0;
         float avg_cat = 0;
         float avg_allcat = 0;
@@ -67,7 +71,9 @@ void forward_detection_layer(const detection_layer l, network_state state)
         memset(l.delta, 0, size * sizeof(float));
         for (b = 0; b < l.batch; ++b){
             int index = b*l.inputs;
+			if(debugDetection) printf("location size:%d\n",locations);
             for (i = 0; i < locations; ++i) {
+				if(debugDetection)printf("location %d:",i);
                 int truth_index = (b*locations + i)*(1+l.coords+l.classes);
                 int is_obj = state.truth[truth_index];
                 for (j = 0; j < l.n; ++j) {
@@ -75,13 +81,13 @@ void forward_detection_layer(const detection_layer l, network_state state)
                     l.delta[p_index] = l.noobject_scale*(0 - l.output[p_index]);
                     *(l.cost) += l.noobject_scale*pow(l.output[p_index], 2);
                     avg_anyobj += l.output[p_index];
+					if(debugDetection)printf("confidence score:%f ",l.output[p_index]);
                 }
 
-                int best_index = -1;
-                float best_iou = 0;
-                float best_rmse = 20;
+                
 
                 if (!is_obj){
+					if(debugDetection)printf("\n");
                     continue;
                 }
 
@@ -91,12 +97,17 @@ void forward_detection_layer(const detection_layer l, network_state state)
                     *(l.cost) += l.class_scale * pow(state.truth[truth_index+1+j] - l.output[class_index+j], 2);
                     if(state.truth[truth_index + 1 + j]) avg_cat += l.output[class_index+j];
                     avg_allcat += l.output[class_index+j];
+					if(debugDetection)printf("class probability:%f \n",l.output[class_index+j]);
                 }
 
                 box truth = float_to_box(state.truth + truth_index + 1 + l.classes);
                 truth.x /= l.side;
                 truth.y /= l.side;
-
+				
+				int best_index = -1;
+                float best_iou = 0;
+                float best_rmse = 20;
+				
                 for(j = 0; j < l.n; ++j){
                     int box_index = index + locations*(l.classes + l.n) + (i*l.n + j) * l.coords;
                     box out = float_to_box(l.output + box_index);
@@ -122,6 +133,7 @@ void forward_detection_layer(const detection_layer l, network_state state)
                             best_index = j;
                         }
                     }
+					if(debugDetection)printf("n= %d x:%f y:%f w:%f h:%f\n",j,out.x,out.y,out.w,out.h);
                 }
 
                 if(l.forced){
@@ -160,19 +172,25 @@ void forward_detection_layer(const detection_layer l, network_state state)
 
                 l.delta[box_index+0] = l.coord_scale*(state.truth[tbox_index + 0] - l.output[box_index + 0]);
                 l.delta[box_index+1] = l.coord_scale*(state.truth[tbox_index + 1] - l.output[box_index + 1]);
-                l.delta[box_index+2] = l.coord_scale*(state.truth[tbox_index + 2] - l.output[box_index + 2]);
-                l.delta[box_index+3] = l.coord_scale*(state.truth[tbox_index + 3] - l.output[box_index + 3]);
+                
                 if(l.sqrt){
                     l.delta[box_index+2] = l.coord_scale*(sqrt(state.truth[tbox_index + 2]) - l.output[box_index + 2]);
                     l.delta[box_index+3] = l.coord_scale*(sqrt(state.truth[tbox_index + 3]) - l.output[box_index + 3]);
                 }
+				else{
+					l.delta[box_index+2] = l.coord_scale*(state.truth[tbox_index + 2] - l.output[box_index + 2]);
+					l.delta[box_index+3] = l.coord_scale*(state.truth[tbox_index + 3] - l.output[box_index + 3]);
+				}
 
                 *(l.cost) += pow(1-iou, 2);
                 avg_iou += iou;
                 ++count;
+				if(debugDetection)printf("BestIndex:%d\n",best_index);
             }
         }
-
+		
+		
+		
         if(0){
             float *costs = calloc(l.batch*locations*l.n, sizeof(float));
             for (b = 0; b < l.batch; ++b) {
@@ -205,6 +223,17 @@ void forward_detection_layer(const detection_layer l, network_state state)
 
         //printf("Detection Avg IOU: %f, Pos Cat: %f, All Cat: %f, Pos Obj: %f, Any Obj: %f, count: %d\n", avg_iou/count, avg_cat/count, avg_allcat/(count*l.classes), avg_obj/count, avg_anyobj/(l.batch*locations*l.n), count);
     }
+	//memcpy(l.output, state.input, l.outputs*l.batch*sizeof(float));
+	
+	//printf("predict:");
+	//for( i = 0 ; i < l.outputs*l.batch; i++){
+	//	printf("%f ",l.output[i]);
+	//}
+	if(debugDetection)printf("\ntruth:");
+	for( i = 0 ; i < 11 && debugDetection; i++){
+		printf("%f ",state.truth[i]);
+	}
+	if(debugDetection)printf("\n");
 }
 
 void backward_detection_layer(const detection_layer l, network_state state)

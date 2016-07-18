@@ -17,7 +17,7 @@
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"
 #endif
-#define labelNum 20
+#define labelNum 1
 //char *label_names[] = {"pedestrian"};
 char *label_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 image atocar_labels[labelNum];
@@ -67,7 +67,7 @@ void train_atocar(char *cfgfile, char *weightfile)
 {
     //char *train_images = "C:/Users/huangsy13/Desktop/test/data/VOCtest_06-Nov-2007/2007_test.txt";//TODO read from configure file
     char *train_images = "../data/train.txt";
-	char *backup_directory = "backup/";
+	char *backup_directory = "../backup/";
     //srand(time(0));//
     data_seed = time(0);
     char *base = basecfg(cfgfile);
@@ -131,11 +131,11 @@ void train_atocar(char *cfgfile, char *weightfile)
         avg_loss = avg_loss*.9 + loss*.1;
 		//printf("in2\n");
         if(i%20 == 0) printf("time %d: loss %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
-        //if(i%1000==0 || (i < 1000 && i%100 == 0)){
-        //    char buff[256];
-        //    sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);
-        //    save_weights(net, buff);
-        //}
+        if(i%1000==0){
+            char buff[256];
+            sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);
+            save_weights(net, buff);
+        }
 		//printf("in3\n");
         free_data(train);
     }

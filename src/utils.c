@@ -583,6 +583,7 @@ size_t rand_size_t()
 
 float rand_uniform(float min, float max)
 {
+	
     return ((float)rand()/RAND_MAX * (max - min)) + min;
 }
 

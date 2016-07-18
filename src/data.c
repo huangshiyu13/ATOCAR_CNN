@@ -482,7 +482,7 @@ data load_data_region(int n, char **paths, int m, int w, int h, int size, int cl
         int pright = rand_uniform(-dw, dw);
         int ptop   = rand_uniform(-dh, dh);
         int pbot   = rand_uniform(-dh, dh);
-
+		printf("%d %d %d %d\n",pleft,pright,ptop,pbot);
         int swidth =  ow - pleft - pright;
         int sheight = oh - ptop - pbot;
 
@@ -496,7 +496,7 @@ data load_data_region(int n, char **paths, int m, int w, int h, int size, int cl
         float dy = ((float)ptop /oh)/sy;
 
         image sized = resize_image(cropped, w, h);
-        if(flip) flip_image(sized);
+        if(flip) flip_image(sized);//翻转
         d.X.vals[i] = sized.data;
 
         fill_truth_region(random_paths[i], d.y.vals[i], classes, size, flip, dx, dy, 1./sx, 1./sy);
