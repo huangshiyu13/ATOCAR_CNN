@@ -65,17 +65,11 @@ extern char* training_file;
 void train_atocar(char *cfgfile, char *weightfile)
 {
 	char *base = basecfg(cfgfile);
+	printf("%s\n", base);
 	network net = parse_network_cfg(cfgfile);
-	
-    //char *train_images = "C:/Users/huangsy13/Desktop/test/data/VOCtest_06-Nov-2007/2007_test.txt";//TODO read from configure file
-	
     char *train_images = training_file;
-	//printf("path:%s %s %s\n",train_images,test_file,backup);
 	char *backup_directory = backup;
-    //srand(time(0));//
     data_seed = time(0);
-    
-    printf("%s\n", base);
     float avg_loss = -1;
     
     if(weightfile){
