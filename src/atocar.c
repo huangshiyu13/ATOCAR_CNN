@@ -19,7 +19,7 @@
 #endif
 #define labelNum 1
 //char *label_names[] = {"pedestrian"};
-char *label_names[] = {"aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "person", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
+char *label_names[] = {"person", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "aeroplane", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 image atocar_labels[labelNum];
 
 void testDetection(network net){
@@ -148,26 +148,51 @@ void convert_detections_atocar(float *predictions, int classes, int num, int squ
     int i,j,n;
     //int per_cell = 5*num+classes;
     for (i = 0; i < side*side; ++i){
+		
+		
         int row = i / side;
         int col = i % side;
+		
         for(n = 0; n < num; ++n){
+			//printf("hah i=%d num =%d,n=%d\n",i,num,n);
             int index = i*num + n;
+			//printf("index=%d\n",index);
             int p_index = side*side*classes + i*num + n;
+			//printf("classes=%d\n",classes);
             float scale = predictions[p_index];
-            int box_index = side*side*(classes + num) + (i*num + n)*4;
-            boxes[index].x = (predictions[box_index + 0] + col) / side * w;
+			//printf("scale=%f\n",scale);
+            //printf("index=%d i=%d n=%d classes=%d ",index,i,n,classes);
+			int box_index = side*side*(classes + num) + (i*num + n)*4;
+            //printf("index=%d i=%d n=%d classes=%d ",index,i,n,classes);
+			boxes[index].x = (predictions[box_index + 0] + col) / side * w;
             boxes[index].y = (predictions[box_index + 1] + row) / side * h;
             boxes[index].w = pow(predictions[box_index + 2], (square?2:1)) * w;
             boxes[index].h = pow(predictions[box_index + 3], (square?2:1)) * h;
-            for(j = 0; j < classes; ++j){
+            //printf("in\n");
+			//printf("i=%d n=%d classes=%d ",i,n,classes);
+			for(j = 0; j < classes; ++j){
+				//printf("i=%d j=%d n=%d classes=%d ",i,j,n,classes);
+				//printf("in1\n");
                 int class_index = i*classes;
-                float prob = scale*predictions[class_index+j];
+                //printf("in2\n");
+				float prob = scale*predictions[class_index+j];
+				//printf("in3\n");
+				//printf("probs=%f\n",probs[index][j]);
+				
+				//printf("in4 index = %d j=%d\n",index,j);
                 probs[index][j] = (prob > thresh) ? prob : 0;
+				
+				//printf("in4 index = %d j=%d\n",index,j);
             }
             if(only_objectness){
                 probs[index][0] = scale;
             }
+			//printf("out\n");
+			
+			
         }
+		
+		
     }
 }
 
@@ -284,22 +309,34 @@ void validate_atocar(char *cfgfile, char *weightfile)
 
 void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)//???
 {
-
+	
     network net = parse_network_cfg(cfgfile);//??
-    if(weightfile){
+
+	if(weightfile){
         load_weights(&net, weightfile);//weights?
     }
+
     detection_layer l = net.layers[net.n-1];
-    set_batch_network(&net, 1);
-    srand(2222222);//TODO should be real random
+
+	set_batch_network(&net, 1);
+ 
+	srand(2222222);//TODO should be real random
     clock_t time;
+	
     char buff[256];
+	
     char *input = buff;
     int j;
+	
     float nms=.5;
+	
     box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;?boundingbox
-    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//?boundingboxиfloat飬??    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
-    while(1){
+    
+	float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//?boundingboxиfloat飬??    
+	for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
+    
+	
+	while(1){
         if(filename){
             strncpy(input, filename, 256);
         } else {
@@ -316,8 +353,11 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
         
 		float *predictions = network_predict(net, X);
         printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
-        convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
-        if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
+        
+		
+		convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
+        
+		if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
         //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
         draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, labelNum);
         
@@ -333,6 +373,7 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
 #endif
         if (filename) break;
     }
+
 }
 
 void draw(){
