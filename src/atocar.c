@@ -32,9 +32,8 @@ void testDetection(network net){
     char *input = buff;
     int j;
     float nms=.5;
-    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;ôboundingbox
-    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//ÿboundingboxиfloat飬Ըֵ
-    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
+    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;?boundingbox
+    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//?boundingboxиfloat飬??    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
   
         
         image im = load_image_color(img_path,0,0);
@@ -62,19 +61,23 @@ void testDetection(network net){
 	//printf("%f %f %f %f %f\n",boxes[0].x,boxes[0].y,boxes[0].w,boxes[0].h,probs[0]);
 	//getchar();
 }
-
+extern char* training_file;
 void train_atocar(char *cfgfile, char *weightfile)
 {
+	char *base = basecfg(cfgfile);
+	network net = parse_network_cfg(cfgfile);
 	
     //char *train_images = "C:/Users/huangsy13/Desktop/test/data/VOCtest_06-Nov-2007/2007_test.txt";//TODO read from configure file
-    char *train_images = "../data/train.txt";
-	char *backup_directory = "../backup/";
+	
+    char *train_images = training_file;
+	//printf("path:%s %s %s\n",train_images,test_file,backup);
+	char *backup_directory = backup;
     //srand(time(0));//
     data_seed = time(0);
-    char *base = basecfg(cfgfile);
+    
     printf("%s\n", base);
     float avg_loss = -1;
-    network net = parse_network_cfg(cfgfile);
+    
     if(weightfile){
         load_weights(&net, weightfile);
     }
@@ -92,7 +95,7 @@ void train_atocar(char *cfgfile, char *weightfile)
 
     list *plist = get_paths(train_images);//image·
     //int N = plist->size;
-    char **paths = (char **)list_to_array(plist);//תб
+    char **paths = (char **)list_to_array(plist);//?б
 
     load_args args = {0};
     args.w = net.w;
@@ -285,12 +288,12 @@ void validate_atocar(char *cfgfile, char *weightfile)
     fprintf(stderr, "Total Detection Time: %f Seconds\n", (double)(time(0) - start));
 }
 
-void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)//ԵͼƬ
+void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)//???
 {
 
-    network net = parse_network_cfg(cfgfile);//ļظ
+    network net = parse_network_cfg(cfgfile);//??
     if(weightfile){
-        load_weights(&net, weightfile);//weightsļ
+        load_weights(&net, weightfile);//weights?
     }
     detection_layer l = net.layers[net.n-1];
     set_batch_network(&net, 1);
@@ -300,9 +303,8 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
     char *input = buff;
     int j;
     float nms=.5;
-    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;ôboundingbox
-    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//ÿboundingboxиfloat飬Ըֵ
-    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
+    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;?boundingbox
+    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//?boundingboxиfloat飬??    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
     while(1){
         if(filename){
             strncpy(input, filename, 256);
@@ -354,7 +356,7 @@ void run_atocar(int argc, char **argv)
         atocar_labels[i] = load_image_color(buff, 0, 0);
     }
 
-    float thresh = find_float_arg(argc, argv, "-thresh", .2);//ĬΪ0.2,С0.2Ĳչʾboundingbox
+    float thresh = find_float_arg(argc, argv, "-thresh", .2);//??0.2,С0.2???boundingbox
     int cam_index = find_int_arg(argc, argv, "-c", 0);//unknow
     int frame_skip = find_int_arg(argc, argv, "-s", 0);//unknow
     if(argc < 4){
@@ -362,9 +364,9 @@ void run_atocar(int argc, char **argv)
         return;
     }
 
-    char *cfg = argv[3];//ļ
-    char *weights = (argc > 4) ? argv[4] : 0;//weightsļ
-    char *filename = (argc > 5) ? argv[5]: 0;//ôļ
+    char *cfg = argv[3];
+    char *weights = (argc > 4) ? argv[4] : 0;//weights
+    char *filename = (argc > 5) ? argv[5]: 0;
     if(0==strcmp(argv[2], "test")) test_atocar(cfg, weights, filename, thresh);
     else if(0==strcmp(argv[2], "train")) train_atocar(cfg, weights);
     else if(0==strcmp(argv[2], "valid")) validate_atocar(cfg, weights);

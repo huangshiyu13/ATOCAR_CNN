@@ -58,7 +58,19 @@ char *option_find(list *l, char *key)
 char *option_find_str(list *l, char *key, char *def)
 {
     char *v = option_find(l, key);
+	
     if(v) return v;
+    if(def) fprintf(stderr, "%s: Using default '%s'\n", key, def);
+    return def;
+}
+
+char *option_find_str_new(list *l, char *key, char *def)
+{
+    char *v = option_find(l, key);
+	char *v_new = calloc(strlen(v), sizeof(char));
+	memcpy(v_new ,v,strlen(v));
+	
+    if(v_new) return v_new;
     if(def) fprintf(stderr, "%s: Using default '%s'\n", key, def);
     return def;
 }

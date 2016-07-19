@@ -7,7 +7,9 @@
 #define SECRET_NUM -1234
 extern char* img_path;
 extern unsigned int data_seed;
-
+extern char* training_file;
+extern char* test_file;
+extern char* backup;
 
 unsigned int myRand();
 void shuffle(void *arr, size_t n, size_t size);

@@ -28,7 +28,7 @@
 #include "list.h"
 #include "option_list.h"
 #include "utils.h"
-
+extern char* training_file;
 typedef struct{
     char *type;//用于存储一行的内容
     list *options;
@@ -449,6 +449,15 @@ learning_rate_policy get_policy(char *s)
 
 void parse_net_options(list *options, network *net)//解析配置文件，
 {
+	//ADD PARAMETER
+	
+	
+	training_file = option_find_str_new(options,"train","constant");
+	test_file = option_find_str_new(options,"test","constant");
+	backup = option_find_str_new(options,"backup","constant");
+	
+	
+	//printf("Hahatrainpath:%s\n",training_file);
     net->batch = option_find_int(options, "batch",1);
     net->learning_rate = option_find_float(options, "learning_rate", .001);
     net->momentum = option_find_float(options, "momentum", .9);
@@ -509,7 +518,7 @@ void parse_net_options(list *options, network *net)//解析配置文件，
     net->max_batches = option_find_int(options, "max_batches", 0);
 }
 
-network parse_network_cfg(char *filename)//用于解析配置文件
+network parse_network_cfg(char *filename)//用于解析配置文件 configeration file analysis
 {
     list *sections = read_cfg(filename);//读入配置文件生成链表
     node *n = sections->front;

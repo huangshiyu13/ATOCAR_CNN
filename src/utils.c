@@ -12,7 +12,9 @@
 
 char* img_path;
 unsigned int data_seed;
-
+char* training_file;
+char* test_file;
+char* backup;
 unsigned int myRand(){
 	srand(data_seed);
 	data_seed = rand();
