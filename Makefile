@@ -69,6 +69,9 @@ results:
 
 .PHONY: clean
 
+bbx:src/bbx.cpp
+	gcc -w -lstdc++ -o bbx src/bbx.cpp   2>bbxError.txt
+
 clean:
-	rm -rf $(OBJS) $(EXEC)
+	rm -rf $(OBJS) $(EXEC) drawRect.exe
 

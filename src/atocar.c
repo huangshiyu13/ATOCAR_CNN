@@ -335,13 +335,21 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
     }
 }
 
+void draw(){
+	image im = load_image("/home/intern/Desktop/dataset/INRIAPerson/train/images/crop001001.png",0,0,0);
+	draw_bbx(im,0.471882640587 ,0.417008196721, 0.305623471883 ,0.610655737705);
+	draw_bbx(im,0.146699266504 ,0.531762295082 ,0.21760391198 ,0.395491803279);
+	draw_bbx(im,0.267726161369 ,0.420081967213 ,0.173594132029, 0.473360655738);
+	save_image(im, "predictions");
+}
+
 void test(){
-		
+	draw();
 } 
 
 void run_atocar(int argc, char **argv)
 {
-	test();
+	//test();
 	//return;
     int i;
     for(i = 0; i < labelNum; ++i){
@@ -364,6 +372,7 @@ void run_atocar(int argc, char **argv)
     if(0==strcmp(argv[2], "test")) test_atocar(cfg, weights, filename, thresh);
     else if(0==strcmp(argv[2], "train")) train_atocar(cfg, weights);
     else if(0==strcmp(argv[2], "valid")) validate_atocar(cfg, weights);
+	else if(0==strcmp(argv[2], "draw")) draw();
     //else if(0==strcmp(argv[2], "recall")) validate_yolo_recall(cfg, weights);
     //else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, filename, label_names, atocar_labels, 20, frame_skip);
 }

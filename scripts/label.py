@@ -29,6 +29,12 @@ def convert(ImgSizeX,ImgSizeY,m):
 	w = w*dw
 	y = y*dh
 	h = h*dh
+	print(Xmin)
+	print(Xmax)
+	print(Ymin)
+	print(Ymax)
+	print(ImgSizeX)
+	print(ImgSizeY)
 	return (x,y,w,h)
 
 def readBBX(root,path,imageId):
@@ -42,7 +48,8 @@ def readBBX(root,path,imageId):
 			ImgSizeX = int(m[0])
 			ImgSizeY = int(m[1])			
 		if 'Xmin' in line:
-			m = re.findall(r'(\w*[0-9+]\w*)',line);
+			m = re.findall(r'(\w*[0-9+]\w*)',line.split(':')[1]);
+			print(m);
 			bb= convert(ImgSizeX,ImgSizeY,m);
 			outfile.write("0 " + " ".join([str(a) for a in bb]) + '\n')
 	lines.close();
@@ -68,7 +75,7 @@ os.system('rm -rf %s'%lablePath)
 for image_id in image_ids:
     list_file.write('%s/train/images/%s.png\n'%(wd,image_id))
     
-    generateLab(wd,lablePath,image_id);
+    generateLab(wd,lablePath,image_id)
 
 list_file.close()
 

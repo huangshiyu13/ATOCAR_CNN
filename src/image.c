@@ -101,6 +101,19 @@ void draw_bbox(image a, box bbox, int w, float r, float g, float b)
     }
 }
 
+void draw_bbx(image im, float x, float y, float w, float h){
+	int left  = (x-w/2.)*im.w;
+	int right = (x+w/2.)*im.w;
+	int top   = (y-h/2.)*im.h;
+	int bot   = (y+h/2.)*im.h;
+	int width = 8;
+	float red = 1;
+	float green = 0;
+	float blue = 0;
+	printf("%d %d %d %d %d %d %f %f %f %f\n",left,right,top,bot,im.w,im.h,x,y,w,h);
+	draw_box_width(im, left, top, right, bot, width, red, green, blue);
+}
+
 void draw_detections(image im, int num, float thresh, box *boxes, float **probs, char **names, image *labels, int classes)
 {
     int i;
@@ -109,8 +122,8 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
         int class = max_index(probs[i], classes);
         float prob = probs[i][class];
         if(prob > thresh){
-            int width = pow(prob, 1./2.)*10+1;
-            width = 8;
+            int width = 8;//pow(prob, 1./2.)*10+1;
+            //width = 8;
             //printf("%s: %.0f%%\n", names[class], prob*100);
             int offset = class*1 % classes;
             float red = get_color(2,offset,classes);
