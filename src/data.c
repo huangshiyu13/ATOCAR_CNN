@@ -236,6 +236,7 @@ void fill_truth_region(char *path, float *truth, int classes, int num_boxes, int
     labelpath = find_replace(labelpath, ".jpg", ".txt");
     labelpath = find_replace(labelpath, ".JPG", ".txt");
     labelpath = find_replace(labelpath, ".JPEG", ".txt");
+	labelpath = find_replace(labelpath, ".png", ".txt");
     int count = 0;
     box_label *boxes = read_boxes(labelpath, &count);
     randomize_boxes(boxes, count);
@@ -482,7 +483,7 @@ data load_data_region(int n, char **paths, int m, int w, int h, int size, int cl
         int pright = rand_uniform(-dw, dw);
         int ptop   = rand_uniform(-dh, dh);
         int pbot   = rand_uniform(-dh, dh);
-		printf("%d %d %d %d\n",pleft,pright,ptop,pbot);
+		//printf("%d %d %d %d\n",pleft,pright,ptop,pbot);
         int swidth =  ow - pleft - pright;
         int sheight = oh - ptop - pbot;
 
@@ -499,7 +500,7 @@ data load_data_region(int n, char **paths, int m, int w, int h, int size, int cl
         if(flip) flip_image(sized);//翻转
         d.X.vals[i] = sized.data;
 
-        fill_truth_region(random_paths[i], d.y.vals[i], classes, size, flip, dx, dy, 1./sx, 1./sy);
+        fill_truth_region(random_paths[i], d.y.vals[i], classes, size, flip, dx, dy, 1./sx, 1./sy);//load ground truth
 
         free_image(orig);
         free_image(cropped);

@@ -355,11 +355,11 @@ float train_network(network net, data d)
     float sum = 0;
 	
     for(i = 0; i < n; ++i){
-		
+		//printf("in1\n");
         get_next_batch(d, batch, i*batch, X, y);
-        
+        //printf("in2\n");
 		float err = train_network_datum(net, X, y);
-		
+		//printf("in3\n");
         sum += err;
     }
 	

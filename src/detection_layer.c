@@ -59,7 +59,6 @@ void forward_detection_layer(const detection_layer l, network_state state)
         }
     }
     if(state.train){
-		
         float avg_iou = 0;
         float avg_cat = 0;
         float avg_allcat = 0;
@@ -231,7 +230,7 @@ void forward_detection_layer(const detection_layer l, network_state state)
 	//}
 	if(debugDetection)printf("\ntruth:");
 	for( i = 0 ; i < 11 && debugDetection; i++){
-		printf("%f ",state.truth[i]);
+		if(debugDetection) printf("%f ",state.truth[i]);
 	}
 	if(debugDetection)printf("\n");
 }

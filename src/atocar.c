@@ -65,6 +65,7 @@ void testDetection(network net){
 
 void train_atocar(char *cfgfile, char *weightfile)
 {
+	
     //char *train_images = "C:/Users/huangsy13/Desktop/test/data/VOCtest_06-Nov-2007/2007_test.txt";//TODO read from configure file
     char *train_images = "../data/train.txt";
 	char *backup_directory = "../backup/";
@@ -126,11 +127,12 @@ void train_atocar(char *cfgfile, char *weightfile)
 		//testDetection(net);
         
 		float loss = train_network(net, train);
+		
         //printf("in1\n");
 		if (avg_loss < 0) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
 		//printf("in2\n");
-        if(i%20 == 0) printf("time %d: loss %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
+        printf("time %d: loss %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
         if(i%1000==0){
             char buff[256];
             sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);
