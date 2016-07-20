@@ -115,10 +115,12 @@ void train_atocar(char *cfgfile, char *weightfile)
 		printf("%s open failed!\n",logFile);
 	}
 	setlinebuf(log);
-    while(get_current_batch(net) < net.max_batches){
+	time=clock();
+	int current_batch=0;
+    while( (current_batch=get_current_batch(net)) < net.max_batches){
         i += 1;
 		
-        time=clock();
+        
         pthread_join(load_thread, 0);
         
 		train = buffer;
@@ -126,7 +128,7 @@ void train_atocar(char *cfgfile, char *weightfile)
 		
         //printf("Loaded: %lf seconds\n", sec(clock()-time));
 		//printf("in0\n");
-        time=clock();
+        
 		//showImg();
 		//printf("test img_path:%s\n",img_path);
 		
@@ -138,12 +140,14 @@ void train_atocar(char *cfgfile, char *weightfile)
 		if (avg_loss < 0) avg_loss = loss;
         avg_loss = avg_loss*.9 + loss*.1;
 		//printf("in2\n");
+		printf("total use = %.0lf seconds, left time = %.0lf seconds\n",sec(clock()-time),sec(clock()-time)/current_batch*(net.max_batches-current_batch));
         printf("time %d: loss %f, %f avg, %f rate, %lf seconds, %d images\n", i, loss, avg_loss, get_current_rate(net), sec(clock()-time), i*imgs);
         if(i%1000==0){
             char buff[256];
             sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);
             save_weights(net, buff);
         }
+		fprintf(log,"total use = %.0lf seconds, left time = %.0lf seconds\n",sec(clock()-time),sec(clock()-time)/current_batch*(net.max_batches-current_batch));
 		fprintf(log,"time=%d loss=%f\n",i,loss);
 		//printf("in3\n");
         free_data(train);
