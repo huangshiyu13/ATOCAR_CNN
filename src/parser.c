@@ -1,4 +1,4 @@
-/**************½âÎöÆ÷************************/
+/**************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -30,7 +30,7 @@
 #include "utils.h"
 extern char* training_file;
 typedef struct{
-    char *type;//ÓÃÓÚ´æ´¢Ò»ĞĞµÄÄÚÈİ
+    char *type;//Ú´æ´¢Ò»Ğµ
     list *options;
 }section;
 
@@ -447,7 +447,7 @@ learning_rate_policy get_policy(char *s)
     return CONSTANT;
 }
 
-void parse_net_options(list *options, network *net)//½âÎöÅäÖÃÎÄ¼ş£¬
+void parse_net_options(list *options, network *net)//Ä¼
 {
 	//ADD PARAMETER
 	
@@ -455,7 +455,7 @@ void parse_net_options(list *options, network *net)//½âÎöÅäÖÃÎÄ¼ş£¬
 	training_file = option_find_str_new(options,"train","constant");
 	test_file = option_find_str_new(options,"test","constant");
 	backup = option_find_str_new(options,"backup","constant");
-	
+	logFile = option_find_str_new(options,"logFile","constant");
 	
 	//printf("Hahatrainpath:%s\n",training_file);
     net->batch = option_find_int(options, "batch",1);
@@ -518,9 +518,9 @@ void parse_net_options(list *options, network *net)//½âÎöÅäÖÃÎÄ¼ş£¬
     net->max_batches = option_find_int(options, "max_batches", 0);
 }
 
-network parse_network_cfg(char *filename)//ÓÃÓÚ½âÎöÅäÖÃÎÄ¼ş configeration file analysis
+network parse_network_cfg(char *filename)//Ú½Ä¼ configeration file analysis
 {
-    list *sections = read_cfg(filename);//¶ÁÈëÅäÖÃÎÄ¼şÉú³ÉÁ´±í
+    list *sections = read_cfg(filename);//Ä¼
     node *n = sections->front;
     if(!n) error("Config file has no sections");
     network net = make_network(sections->size - 1);
@@ -529,7 +529,7 @@ network parse_network_cfg(char *filename)//ÓÃÓÚ½âÎöÅäÖÃÎÄ¼ş configeration file a
     section *s = (section *)n->val;
     list *options = s->options;
     if(!is_network(s)) error("First section must be [net] or [network]");
-    parse_net_options(options, &net);//½âÎöÍøÂçÅäÖÃ£¬±ÈÈçpolicy,learning rate and etc.
+    parse_net_options(options, &net);//Ã£policy,learning rate and etc.
 
     params.h = net.h;
     params.w = net.w;
@@ -542,7 +542,7 @@ network parse_network_cfg(char *filename)//ÓÃÓÚ½âÎöÅäÖÃÎÄ¼ş configeration file a
     n = n->next;
     int count = 0;
     free_section(s);
-    while(n){//¿ªÊ¼½âÎö¸÷¸ö²ã
+    while(n){//Ê¼
         params.index = count;
         fprintf(stderr, "%d: ", count);
         s = (section *)n->val;
@@ -756,15 +756,15 @@ list *read_cfg(char *filename)
     if(file == 0) file_error(filename);
     char *line;
     int nu = 0;
-    list *sections = make_list();//³õÊ¼»¯Ë«ÏòÁ´±í
+    list *sections = make_list();//Ê¼Ë«
     section *current = 0;
-    while((line=fgetl(file)) != 0){//È¡µÃÒ»ĞĞ
+    while((line=fgetl(file)) != 0){//È¡Ò»
         ++ nu;
-        strip(line);//È¥µôÖÆ±í·û£¬»»ĞĞ·ûºÍ¿Õ¸ñ
+        strip(line);//È¥Æ±Ğ·Í¿Õ¸
         switch(line[0]){
             case '[':
                 current = malloc(sizeof(section));
-                list_insert(sections, current);//²åÈëÁ´±í
+                list_insert(sections, current);//
                 current->options = make_list();
                 current->type = line;
                 break;
@@ -774,7 +774,7 @@ list *read_cfg(char *filename)
                 free(line);
                 break;
             default:
-                if(!read_option(line, current->options)){//²åÈë(key,val)¶Ô
+                if(!read_option(line, current->options)){//(key,val)
                     fprintf(stderr, "Config file error line %d, could parse: %s\n", nu, line);
                     free(line);
                 }

@@ -22,6 +22,34 @@
 char *label_names[] = {"person", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "aeroplane", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 image atocar_labels[labelNum];
 
+char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+struct TimeManager{
+	int year;
+	int month;
+	int day;
+	char* wed;
+	int hour;
+	int min;
+	int sec;
+	
+}timeManager;
+
+void getTimeNow(){
+	time_t timep;
+	struct tm *p;
+	time(&timep);
+	p = gmtime(&timep);
+	timeManager.year = 1900+p->tm_year;
+	timeManager.month= 1+p->tm_mon;
+	timeManager.day  = p->tm_mday;
+	timeManager.wed  = wday[p->tm_wday];
+	timeManager.hour = p->tm_hour;
+	timeManager.min  = p->tm_min;
+	timeManager.sec  = p->tm_sec;
+}
+
+
 void testDetection(network net){
 	float thresh = 0.5;
     detection_layer l = net.layers[net.n-1];
@@ -106,6 +134,14 @@ void train_atocar(char *cfgfile, char *weightfile)
     pthread_t load_thread = load_data_in_thread(args);
     clock_t time;
     //while(i*imgs < N*120){
+	FILE* log;
+	if(log=fopen(logFile,"w+")){
+		printf("Log File Path:%s\n",logFile);
+	}
+	else{
+		printf("%s open failed!\n",logFile);
+	}
+	setlinebuf(log);
     while(get_current_batch(net) < net.max_batches){
         i += 1;
 		
@@ -135,9 +171,11 @@ void train_atocar(char *cfgfile, char *weightfile)
             sprintf(buff, "%s/atocar_%d.weights", backup_directory,  i);
             save_weights(net, buff);
         }
+		fprintf(log,"time=%d loss=%f\n",i,loss);
 		//printf("in3\n");
         free_data(train);
     }
+	fclose(log);
     char buff[256];
     sprintf(buff, "%s/atocar.weights", backup_directory);
     save_weights(net, buff);

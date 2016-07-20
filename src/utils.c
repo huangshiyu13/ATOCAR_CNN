@@ -15,6 +15,8 @@ unsigned int data_seed;
 char* training_file;
 char* test_file;
 char* backup;
+char* logFile;
+
 unsigned int myRand(){
 	srand(data_seed);
 	data_seed = rand();

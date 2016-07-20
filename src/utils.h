@@ -10,6 +10,7 @@ extern unsigned int data_seed;
 extern char* training_file;
 extern char* test_file;
 extern char* backup;
+extern char* logFile;
 
 unsigned int myRand();
 void shuffle(void *arr, size_t n, size_t size);
