@@ -11,6 +11,20 @@ extern char* training_file;
 extern char* test_file;
 extern char* backup;
 extern char* logFile;
+extern char* testOutputDir;
+
+typedef struct{
+	int year;
+	int month;
+	int day;
+	char* wed;
+	int hour;
+	int min;
+	int sec;
+}TimeManager;
+
+extern TimeManager timeManager;
+void getTimeNow();
 
 unsigned int myRand();
 void shuffle(void *arr, size_t n, size_t size);

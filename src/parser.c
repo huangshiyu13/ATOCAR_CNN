@@ -456,6 +456,7 @@ void parse_net_options(list *options, network *net)//ļ
 	test_file = option_find_str_new(options,"test","constant");
 	backup = option_find_str_new(options,"backup","constant");
 	logFile = option_find_str_new(options,"logFile","constant");
+	testOutputDir=option_find_str_new(options,"testOutputDir","constant");
 	
 	//printf("Hahatrainpath:%s\n",training_file);
     net->batch = option_find_int(options, "batch",1);

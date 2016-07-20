@@ -361,7 +361,7 @@ void show_image_cv(image p, const char *name)
     {
         char buff[256];
         //sprintf(buff, "%s (%d)", name, windows);
-        sprintf(buff, "%s.png", name);
+        sprintf(buff, "%s", name);
         unsigned char *data = calloc(im.w*im.h*im.c, sizeof(char));
         int i,k;
         for(k = 0; k < im.c; ++k){

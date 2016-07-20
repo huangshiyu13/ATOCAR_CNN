@@ -22,36 +22,9 @@
 char *label_names[] = {"person", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "diningtable", "dog", "horse", "motorbike", "aeroplane", "pottedplant", "sheep", "sofa", "train", "tvmonitor"};
 image atocar_labels[labelNum];
 
-char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-
-struct TimeManager{
-	int year;
-	int month;
-	int day;
-	char* wed;
-	int hour;
-	int min;
-	int sec;
-	
-}timeManager;
-
-void getTimeNow(){
-	time_t timep;
-	struct tm *p;
-	time(&timep);
-	p = gmtime(&timep);
-	timeManager.year = 1900+p->tm_year;
-	timeManager.month= 1+p->tm_mon;
-	timeManager.day  = p->tm_mday;
-	timeManager.wed  = wday[p->tm_wday];
-	timeManager.hour = p->tm_hour;
-	timeManager.min  = p->tm_min;
-	timeManager.sec  = p->tm_sec;
-}
-
 
 void testDetection(network net){
-	float thresh = 0.5;
+    float thresh = 0.5;
     detection_layer l = net.layers[net.n-1];
     set_batch_network(&net, 1);
     srand(2222222);//TODO should be real random
@@ -345,7 +318,21 @@ void validate_atocar(char *cfgfile, char *weightfile)
     fprintf(stderr, "Total Detection Time: %f Seconds\n", (double)(time(0) - start));
 }
 
-void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)//???
+void genOutputImgPath(char* filename,char outputFileImgName[],int start){
+	int i;
+	for(i = strlen(filename)-1 ; i>=0 ;i-- ){
+		if(filename[i]=='/'){
+				break;
+		}
+	}
+	int j;
+	for(j = 0 ; j < strlen(filename)-i-1 ; j++){
+		outputFileImgName[start+j]=filename[i+j+1];
+	}
+	outputFileImgName[start+j]='\0';
+}
+
+void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)
 {
 	
     network net = parse_network_cfg(cfgfile);//??
@@ -374,7 +361,27 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
 	for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
     
 	
-	while(1){
+	FILE *file = fopen(test_file, "r");
+    if(!file){
+		printf("test file load failed!\n");
+	}
+	else{
+		printf("test list is %s\n",test_file);
+	}
+    
+	char outputFileImgName[512];
+	int i;
+	//printf("strlen(testOutputDir) = %d\n",strlen(testOutputDir));
+	for(i = 0 ; i < strlen(testOutputDir); i++){
+		outputFileImgName[i] = testOutputDir[i];
+	}
+	int start=strlen(testOutputDir);
+	if(outputFileImgName[start-1]!='/'){
+		outputFileImgName[start]='/';
+		start++;
+	}
+	
+	while( (filename=fgetl(file)) ){
         if(filename){
             strncpy(input, filename, 256);
         } else {
@@ -384,13 +391,14 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
             if(!input) return;
             strtok(input, "\n");
         }
+		printf("start to test %s\n",filename);
         image im = load_image_color(input,0,0);
         image sized = resize_image(im, net.w, net.h);
         float *X = sized.data;
         time=clock();
         
 		float *predictions = network_predict(net, X);
-        printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
+        //printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
         
 		
 		convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
@@ -399,19 +407,20 @@ void test_atocar(char *cfgfile, char *weightfile, char *filename, float thresh)/
         //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
         draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, labelNum);
         
-		save_image(im, "predictions");
-        show_image(im, "predictions");
+		genOutputImgPath(filename,outputFileImgName,start);
+		//printf("%s\n",outputFileImgName);
+		save_image(im, outputFileImgName);
+        //show_image(im, "predictions");
 
-        show_image(sized, "resized");
+        //show_image(sized, "resized");
         free_image(im);
         free_image(sized);
 #ifdef OPENCV
         cvWaitKey(0);
         cvDestroyAllWindows();
 #endif
-        if (filename) break;
     }
-
+	fclose(file);
 }
 
 void draw(){

@@ -16,6 +16,24 @@ char* training_file;
 char* test_file;
 char* backup;
 char* logFile;
+char* testOutputDir;
+char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+
+TimeManager timeManager;
+
+void getTimeNow(){
+	time_t timep;
+	struct tm *p;
+	time(&timep);
+	p = gmtime(&timep);
+	timeManager.year = 1900+p->tm_year;
+	timeManager.month= 1+p->tm_mon;
+	timeManager.day  = p->tm_mday;
+	timeManager.wed  = wday[p->tm_wday];
+	timeManager.hour = p->tm_hour;
+	timeManager.min  = p->tm_min;
+	timeManager.sec  = p->tm_sec;
+}
 
 unsigned int myRand(){
 	srand(data_seed);
