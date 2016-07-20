@@ -23,45 +23,6 @@ char *label_names[] = {"person", "bicycle", "bird", "boat", "bottle", "bus", "ca
 image atocar_labels[labelNum];
 
 
-void testDetection(network net){
-    float thresh = 0.5;
-    detection_layer l = net.layers[net.n-1];
-    set_batch_network(&net, 1);
-    srand(2222222);//TODO should be real random
-    clock_t time;
-    char buff[256];
-    char *input = buff;
-    int j;
-    float nms=.5;
-    box *boxes = calloc(l.side*l.side*l.n, sizeof(box));//float x, y, w, h;?boundingbox
-    float **probs = calloc(l.side*l.side*l.n, sizeof(float *));//?boundingboxиfloat飬??    for(j = 0; j < l.side*l.side*l.n; ++j) probs[j] = calloc(l.classes, sizeof(float *));
-  
-        
-        image im = load_image_color(img_path,0,0);
-        image sized = resize_image(im, net.w, net.h);
-        float *X = sized.data;
-        time=clock();
-        
-		float *predictions = network_predict(net, X);
-        //printf("%s: Predicted in %f seconds.\n", input, sec(clock()-time));
-        convert_detections_atocar(predictions, l.classes, l.n, l.sqrt, l.side, 1, 1, thresh, probs, boxes, 0);
-        if (nms) do_nms_sort(boxes, probs, l.side*l.side*l.n, l.classes, nms);
-        //draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, 20);
-        draw_detections(im, l.side*l.side*l.n, thresh, boxes, probs, label_names, atocar_labels, labelNum);
-        
-		save_image(im, "predictions");
-        show_image(im, "predictions");
-
-        show_image(sized, "resized");
-        free_image(im);
-        free_image(sized);
-#ifdef OPENCV
-        cvWaitKey(0);
-        cvDestroyAllWindows();
-#endif
-	//printf("%f %f %f %f %f\n",boxes[0].x,boxes[0].y,boxes[0].w,boxes[0].h,probs[0]);
-	//getchar();
-}
 extern char* training_file;
 void train_atocar(char *cfgfile, char *weightfile)
 {
@@ -211,116 +172,6 @@ void convert_detections_atocar(float *predictions, int classes, int num, int squ
     }
 }
 
-void print_atocar_detections(FILE **fps, char *id, box *boxes, float **probs, int total, int classes, int w, int h)
-{
-    int i, j;
-    for(i = 0; i < total; ++i){
-        float xmin = boxes[i].x - boxes[i].w/2.;
-        float xmax = boxes[i].x + boxes[i].w/2.;
-        float ymin = boxes[i].y - boxes[i].h/2.;
-        float ymax = boxes[i].y + boxes[i].h/2.;
-
-        if (xmin < 0) xmin = 0;
-        if (ymin < 0) ymin = 0;
-        if (xmax > w) xmax = w;
-        if (ymax > h) ymax = h;
-
-        for(j = 0; j < classes; ++j){
-            if (probs[i][j]) fprintf(fps[j], "%s %f %f %f %f %f\n", id, probs[i][j],
-										 xmin, ymin, xmax, ymax);
-        }
-    }
-}
-
-void validate_atocar(char *cfgfile, char *weightfile)
-{
-    network net = parse_network_cfg(cfgfile);
-    if(weightfile){
-        load_weights(&net, weightfile);
-    }
-    set_batch_network(&net, 1);
-    fprintf(stderr, "Learning Rate: %g, Momentum: %g, Decay: %g\n", net.learning_rate, net.momentum, net.decay);
-    srand(time(0));
-
-    char *base = "results/comp4_det_test_";
-    //list *plist = get_paths("data/voc.2007.test");
-    list *plist = get_paths("/home/pjreddie/data/voc/2007_test.txt");
-    //list *plist = get_paths("data/voc.2012.test");
-    char **paths = (char **)list_to_array(plist);
-
-    layer l = net.layers[net.n-1];
-    int classes = l.classes;
-    int square = l.sqrt;
-    int side = l.side;
-
-    int j;
-    FILE **fps = calloc(classes, sizeof(FILE *));
-    for(j = 0; j < classes; ++j){
-        char buff[1024];
-        snprintf(buff, 1024, "%s%s.txt", base, label_names[j]);
-        fps[j] = fopen(buff, "w");
-    }
-    box *boxes = calloc(side*side*l.n, sizeof(box));
-    float **probs = calloc(side*side*l.n, sizeof(float *));
-    for(j = 0; j < side*side*l.n; ++j) probs[j] = calloc(classes, sizeof(float *));
-
-    int m = plist->size;
-    int i=0;
-    int t;
-
-    float thresh = .001;
-    int nms = 1;
-    float iou_thresh = .5;
-
-    int nthreads = 2;
-    image *val = calloc(nthreads, sizeof(image));
-    image *val_resized = calloc(nthreads, sizeof(image));
-    image *buf = calloc(nthreads, sizeof(image));
-    image *buf_resized = calloc(nthreads, sizeof(image));
-    pthread_t *thr = calloc(nthreads, sizeof(pthread_t));
-
-    load_args args = {0};
-    args.w = net.w;
-    args.h = net.h;
-    args.type = IMAGE_DATA;
-
-    for(t = 0; t < nthreads; ++t){
-        args.path = paths[i+t];
-        args.im = &buf[t];
-        args.resized = &buf_resized[t];
-        thr[t] = load_data_in_thread(args);
-    }
-    time_t start = time(0);
-    for(i = nthreads; i < m+nthreads; i += nthreads){
-        fprintf(stderr, "%d\n", i);
-        for(t = 0; t < nthreads && i+t-nthreads < m; ++t){
-            pthread_join(thr[t], 0);
-            val[t] = buf[t];
-            val_resized[t] = buf_resized[t];
-        }
-        for(t = 0; t < nthreads && i+t < m; ++t){
-            args.path = paths[i+t];
-            args.im = &buf[t];
-            args.resized = &buf_resized[t];
-            thr[t] = load_data_in_thread(args);
-        }
-        for(t = 0; t < nthreads && i+t-nthreads < m; ++t){
-            char *path = paths[i+t-nthreads];
-            char *id = basecfg(path);
-            float *X = val_resized[t].data;
-            float *predictions = network_predict(net, X);
-            int w = val[t].w;
-            int h = val[t].h;
-            convert_detections_atocar(predictions, classes, l.n, square, side, w, h, thresh, probs, boxes, 0);
-            if (nms) do_nms_sort(boxes, probs, side*side*l.n, classes, iou_thresh);
-            print_atocar_detections(fps, id, boxes, probs, side*side*l.n, classes, w, h);
-            free(id);
-            free_image(val[t]);
-            free_image(val_resized[t]);
-        }
-    }
-    fprintf(stderr, "Total Detection Time: %f Seconds\n", (double)(time(0) - start));
-}
 
 void genOutputImgPath(char* filename,char outputFileImgName[],int start){
 	int i;
@@ -436,12 +287,12 @@ void draw(){
 }
 
 void test(){
-	draw();
+	//_mkdir("../testNow");
 } 
 
 void run_atocar(int argc, char **argv)
 {
-	//test();
+	test();
 	//return;
     int i;
     for(i = 0; i < labelNum; ++i){
@@ -463,7 +314,6 @@ void run_atocar(int argc, char **argv)
     char *filename = (argc > 5) ? argv[5]: 0;
     if(0==strcmp(argv[2], "test")) test_atocar(cfg, weights, filename, thresh);
     else if(0==strcmp(argv[2], "train")) train_atocar(cfg, weights);
-    else if(0==strcmp(argv[2], "valid")) validate_atocar(cfg, weights);
 	else if(0==strcmp(argv[2], "draw")) draw();
     //else if(0==strcmp(argv[2], "recall")) validate_yolo_recall(cfg, weights);
     //else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, cam_index, filename, label_names, atocar_labels, 20, frame_skip);
