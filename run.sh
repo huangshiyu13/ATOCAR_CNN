@@ -1,1 +1,1 @@
-./darknet atocar train ./cfg/atocar.cfg ../weights/extraction.conv.weights
+./darknet -i 1 atocar train ./cfg/test.cfg ../weights/yolo.weights

@@ -451,13 +451,20 @@ void parse_net_options(list *options, network *net)//ļ
 {
 	//ADD PARAMETER
 	
-	
 	training_file = option_find_str_new(options,"train","constant");
-	test_file = option_find_str_new(options,"test","constant");
-	backup = option_find_str_new(options,"backup","constant");
-	logFile = option_find_str_new(options,"logFile","constant");
-	testOutputDir=option_find_str_new(options,"testOutputDir","constant");
+	test_file     = option_find_str_new(options,"test","constant");
+	backup        = option_find_str_new(options,"backup","constant");
+	logFile       = option_find_str_new(options,"logFile","constant");
+	testOutputDir = option_find_str_new(options,"testOutputDir","constant");
 	
+	testTxt       = option_find_str_new(options,"testTxt","constant");
+	
+	testTxtOutPut = option_find_str_new(options,"testTxtOutputDir","constant");
+	testImg       = option_find_str_new(options,"testImg","constant");
+	finetue       = option_find_str_new(options,"finetue","constant");
+	testOutThreshold=option_find_float(options, "testOutThreshold", .01);
+	testImgThreshold=option_find_float(options, "testImgThreshold", .2 );
+	    	
 	//printf("Hahatrainpath:%s\n",training_file);
     net->batch = option_find_int(options, "batch",1);
     net->learning_rate = option_find_float(options, "learning_rate", .001);
@@ -1082,6 +1089,9 @@ void load_weights_upto(network *net, char *filename, int cutoff)
     fread(&minor, sizeof(int), 1, fp);
     fread(&revision, sizeof(int), 1, fp);
     fread(net->seen, sizeof(int), 1, fp);
+	if(finetue && (finetue[0]=='t' || finetue[0]=='T') ){
+		*net->seen = 0;
+	}
     int transpose = (major > 1000) || (minor > 1000);
 
     int i;

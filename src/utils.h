@@ -12,6 +12,12 @@ extern char* test_file;
 extern char* backup;
 extern char* logFile;
 extern char* testOutputDir;
+extern char* testTxt;
+extern char* testTxtOutPut;
+extern char* testImg;
+extern char* finetue;
+extern float testOutThreshold;
+extern float testImgThreshold;
 
 typedef struct{
 	int year;

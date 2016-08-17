@@ -17,7 +17,13 @@ char* test_file;
 char* backup;
 char* logFile;
 char* testOutputDir;
+char* testTxt;
 char *wday[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+char* testTxtOutPut;
+char* testImg;
+char* finetue;
+float testOutThreshold;
+float testImgThreshold;
 
 TimeManager timeManager;
 

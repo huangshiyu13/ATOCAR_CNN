@@ -1,6 +1,5 @@
-./darknet -i 1 atocar \
+./darknet -i 0 atocar \
 test \
--thresh 0.2 \
-cfg/atocar.cfg \
-../backup/atocar_14000.weights \
-/home/intern/Desktop/dataset/INRIAPerson/test/images/crop001566.png
+-thresh 0.0 \
+cfg/yolop_n1.cfg \
+../YOLOP_n1/backup/atocar_2000.weights
